@@ -285,14 +285,14 @@ foreach ($item in $globalHelloIDVariables) {
 
 <# Begin: HelloID Data sources #><# End: HelloID Data sources #>
 
-<# Begin: Dynamic Form "Mailbox - List mailbox that user has permisions to" #>
+<# Begin: Dynamic Form "Mailbox - List mailbox that user has permissions to" #>
 $tmpSchema = @"
 [{"templateOptions":{},"type":"markdown","summaryVisibility":"Show","body":"Retrieving this information from Exchange takes so much time that we will not show it directly in the overview.\nYou will receive an email  with the overview as a CSV file attachment","requiresTemplateOptions":false,"requiresKey":false},{"key":"userPrincipalName","templateOptions":{"label":"UserPrincipalName of User","required":true},"type":"input","summaryVisibility":"Show","requiresTemplateOptions":true,"requiresKey":true}]
 "@ 
 
 $dynamicFormGuid = [PSCustomObject]@{} 
 $dynamicFormName = @'
-Mailbox - List mailbox that user has permisions to
+Mailbox - List mailbox that user has permissions to
 '@ 
 Invoke-HelloIDDynamicForm -FormName $dynamicFormName -FormSchema $tmpSchema  -returnObject ([Ref]$dynamicFormGuid) 
 <# END: Dynamic Form #>
@@ -340,7 +340,7 @@ $delegatedFormCategoryGuids = (ConvertTo-Json -InputObject $delegatedFormCategor
 <# Begin: Delegated Form #>
 $delegatedFormRef = [PSCustomObject]@{guid = $null; created = $null} 
 $delegatedFormName = @'
-Mailbox - List mailbox that user has permisions to
+Mailbox - List mailbox that user has permissions to
 '@
 Invoke-HelloIDDelegatedForm -DelegatedFormName $delegatedFormName -DynamicFormGuid $dynamicFormGuid -AccessGroups $delegatedFormAccessGroupGuids -Categories $delegatedFormCategoryGuids -UseFaIcon "True" -FaIcon "fa fa-list" -returnObject ([Ref]$delegatedFormRef) 
 <# End: Delegated Form #>
@@ -640,7 +640,7 @@ try {
 
 	$delegatedFormTaskGuid = [PSCustomObject]@{} 
 $delegatedFormTaskName = @'
-List mailbox that user has permisions to and Send as mail attachment
+List mailbox that user has permissions to and Send as mail attachment
 '@
 	Invoke-HelloIDAutomationTask -TaskName $delegatedFormTaskName -UseTemplate "False" -AutomationContainer "8" -Variables $tmpVariables -PowershellScript $tmpScript -ObjectGuid $delegatedFormRef.guid -ForceCreateTask $true -returnObject ([Ref]$delegatedFormTaskGuid) 
 } else {
