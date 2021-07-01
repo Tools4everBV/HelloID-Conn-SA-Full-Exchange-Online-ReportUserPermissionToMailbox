@@ -1,0 +1,10 @@
+[
+    {
+        "name":  "RequesterMail",
+        "value":  "{{requester.contactEmail}}"
+    },
+    {
+        "name":  "UserPrincipalName",
+        "value":  "{{form.userPrincipalName}}"
+    }
+]

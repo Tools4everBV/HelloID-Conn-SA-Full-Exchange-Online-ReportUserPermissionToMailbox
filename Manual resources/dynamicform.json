@@ -1,0 +1,23 @@
+[
+    {
+        "templateOptions":  {
+
+                            },
+        "type":  "markdown",
+        "summaryVisibility":  "Show",
+        "body":  "Retrieving this information from Exchange takes so much time that we will not show it directly in the overview.\nYou will receive an email  with the overview as a CSV file attachment",
+        "requiresTemplateOptions":  false,
+        "requiresKey":  false
+    },
+    {
+        "key":  "userPrincipalName",
+        "templateOptions":  {
+                                "label":  "UserPrincipalName of User",
+                                "required":  true
+                            },
+        "type":  "input",
+        "summaryVisibility":  "Show",
+        "requiresTemplateOptions":  true,
+        "requiresKey":  true
+    }
+]
