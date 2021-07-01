@@ -96,9 +96,9 @@ try {
         }
     }
 
-    Hid-Write-Status -Event Information -Message "Mailboxes which user has Full Access permissions to: $($mailboxesFullAccess.Name.Count)"
+    Hid-Write-Status -Event Information -Message "Mailboxes which user has Full Access permissions to: $($mailboxesFullAccess.Count)"
     
-    if($mailboxesFullAccess.Name.Count -gt 0){
+    if($mailboxesFullAccess.Count -gt 0){
         foreach($entry in $mailboxesFullAccess){
             $null = $allMailboxesWithPermission.Add($entry)
         }
@@ -152,9 +152,9 @@ try {
         }
     }
 
-    Hid-Write-Status -Event Information -Message "Mailboxes which user has Send As permissions to: $($mailboxesSendAs.Name.Count)"
+    Hid-Write-Status -Event Information -Message "Mailboxes which user has Send As permissions to: $($mailboxesSendAs.Count)"
     
-    if($mailboxesSendAs.Name.Count -gt 0){
+    if($mailboxesSendAs.Count -gt 0){
         foreach($entry in $mailboxesSendAs){
             $null = $allMailboxesWithPermission.Add($entry)
         }
@@ -201,9 +201,9 @@ try {
         }
     }
 
-    Hid-Write-Status -Event Information -Message "Mailboxes which user has Send On Behalf permissions to: $($mailboxesSendOnBehalf.Name.Count)"
+    Hid-Write-Status -Event Information -Message "Mailboxes which user has Send On Behalf permissions to: $($mailboxesSendOnBehalf.Count)"
     
-    if($mailboxesSendOnBehalf.Name.Count -gt 0){
+    if($mailboxesSendOnBehalf.Count -gt 0){
         foreach($entry in $mailboxesSendOnBehalf){
             $null = $allMailboxesWithPermission.Add($entry)
         }
@@ -212,8 +212,8 @@ try {
     # Create temp csv file
     $currentDate = (Get-Date).ToString("yyyy_MM_dd_HHmmss")
 
-    if(!(Test-Path -Path $tempFileLocation)){
-        $newfile = New-Item $tempFileLocation -Force -Confirm:$false
+    if(!(Test-Path -Path $tempFileLocation -PathType Container)){
+        $newPath = New-Item $tempFileLocation -ItemType Directory -Force -Confirm:$false
     }
 
     $fileName = "$tempFileLocation\$UserPrincipalName $currentDate.csv"
