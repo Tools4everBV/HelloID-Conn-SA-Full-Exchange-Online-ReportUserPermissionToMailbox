@@ -11,6 +11,12 @@ The following options are available:
  1. Overview of mailboxes that match this report
  2. Send the overview as CSV attachment in a mail to the requester's mail
 
+## Versioning
+| Version | Description | Date |
+| - | - | - |
+| 1.0.1   | Added version number and updated all-in-one script | 2021/11/16  |
+| 1.0.0   | Initial release | 2021/04/29  |
+
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
 * [Description](#description)
@@ -45,5 +51,8 @@ This Delegated Form uses the following resources in order to run
 ### Powershell data source 'mailbox-generate-users-with-permission-userprincipalname'
 This Powershell data source runs an Exchange Online and AD query to select the user accounts that match this report.
 
-# HelloID Docs
+## Getting help
+_If you need help, feel free to ask questions on our [forum](https://forum.helloid.com/forum/helloid-connectors/service-automation/92-helloid-sa-exchange-online-list-mailbox-that-user-has-permission-to-send-as-csv)_
+
+## HelloID Docs
 The official HelloID documentation can be found at: https://docs.helloid.com/
