@@ -20,7 +20,7 @@ try{
     $module = Import-Module ExchangeOnlineManagement
 
     $securePassword = ConvertTo-SecureString $ExchangeOnlineAdminPassword -AsPlainText -Force
-    $credential = New-Object System.Management.Automation.PSCredential ($ExchangeOnlineAdminUsername, $securePassword)
+    $credential = [System.Management.Automation.PSCredential]::new($ExchangeOnlineAdminUsername,$securePassword)
 
     $exchangeSession = Connect-ExchangeOnline -Credential $credential -ShowBanner:$false -ShowProgress:$false -TrackPerformance:$false -ErrorAction Stop 
 
@@ -36,7 +36,7 @@ try {
     
     # Can't be used because of a bug in PS 5.1
     #$adGroups = Get-ADPrincipalGroupMembership -Identity $adUser
-    $adGroups = New-Object System.Collections.ArrayList
+    $adGroups = [System.Collections.ArrayList]::new()
     foreach($group in $adUser.MemberOf) {
         $null = $adGroups.Add((Get-ADGroup $group)) # direct output to NULL or else we'll get an int
     }
@@ -59,7 +59,7 @@ try {
             $mailbox = $mailBoxesGrouped."$($fullAccessPermission.Identity)"
 
             if($mailbox){
-                $mailboxFullAccess = New-Object PsObject
+                $mailboxFullAccess = [PsObject]::new()
 
                 $mailboxFullAccess | Add-Member -MemberType NoteProperty -Name Permission -Value "Full Access" -Force
                 $mailboxFullAccess | Add-Member -MemberType NoteProperty -Name DisplayName -Value $mailbox.DisplayName -Force
@@ -79,7 +79,7 @@ try {
                     $mailbox = $mailBoxesGrouped."$($fullAccessPermission.Identity)"
 
                     if($mailbox){
-                        $mailboxFullAccess = New-Object PsObject
+                        $mailboxFullAccess = [PsObject]::new()
 
                         $mailboxFullAccess | Add-Member -MemberType NoteProperty -Name Permission -Value "Full Access" -Force
                         $mailboxFullAccess | Add-Member -MemberType NoteProperty -Name DisplayName -Value $mailbox.DisplayName -Force
@@ -115,7 +115,7 @@ try {
             $mailbox = $mailBoxesGrouped."$($SendAsPermission.Identity)"
 
             if($mailbox){
-                $mailBoxSendAs = New-Object PsObject
+                $mailBoxSendAs = [PsObject]::new()
 
                 $mailBoxSendAs | Add-Member -MemberType NoteProperty -Name Permission -Value "Send As" -Force
                 $mailBoxSendAs | Add-Member -MemberType NoteProperty -Name DisplayName -Value $mailbox.DisplayName -Force
@@ -135,7 +135,7 @@ try {
                     $mailbox = $mailBoxesGrouped."$($SendAsPermission.Identity)"
 
                     if($mailbox){
-                        $mailBoxSendAs = New-Object PsObject
+                        $mailBoxSendAs = [PsObject]::new()
 
                         $mailBoxSendAs | Add-Member -MemberType NoteProperty -Name Permission -Value "Send As" -Force
                         $mailBoxSendAs | Add-Member -MemberType NoteProperty -Name DisplayName -Value $mailbox.DisplayName -Force
@@ -168,7 +168,7 @@ try {
     foreach($mailbox in $mailboxes){
         if(![String]::IsNullOrEmpty($mailbox.GrantSendOnBehalfTo)){
             if($mailbox.GrantSendOnBehalfTo -match "$($adUser.Name)"){
-                $mailBoxSendOnBehalf = New-Object PsObject
+                $mailBoxSendOnBehalf = [PsObject]::new()
 
                 $mailBoxSendOnBehalf | Add-Member -MemberType NoteProperty -Name Permission -Value "Send On Behalf" -Force
                 $mailBoxSendOnBehalf | Add-Member -MemberType NoteProperty -Name DisplayName -Value $mailbox.DisplayName -Force
@@ -184,7 +184,7 @@ try {
             if($mailbox.GrantSendOnBehalfTo -in $adGroupsWithMailboxPermissions.Name){
                 foreach($adGroup in $adGroupsWithMailboxPermissions){
                     if($mailbox.GrantSendOnBehalfTo -match "$($adGroup.Name)"){
-                        $mailBoxSendOnBehalf = New-Object PsObject
+                        $mailBoxSendOnBehalf = [PsObject]::new()
 
                         $mailBoxSendOnBehalf | Add-Member -MemberType NoteProperty -Name Permission -Value "Send On Behalf" -Force
                         $mailBoxSendOnBehalf | Add-Member -MemberType NoteProperty -Name DisplayName -Value $mailbox.DisplayName -Force
@@ -237,7 +237,7 @@ try {
         # Send mail
         if($mailSmtpUsername -and $mailSmtpPassword){
             $mailSecurePassword = $mailSmtpPassword | ConvertTo-SecureString -asPlainText -Force
-            $mailCredentials = New-Object System.Management.Automation.PSCredential($mailSmtpUsername,$mailSecurePassword)
+            $mailCredentials = [System.Management.Automation.PSCredential]::new($mailSmtpUsername,$mailSecurePassword)
         }
 
         $allParams = @{
