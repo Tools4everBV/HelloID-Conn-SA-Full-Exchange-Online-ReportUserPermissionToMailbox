@@ -414,7 +414,7 @@ $mailBCC = ""
 
 # Connect to Office 365
 try{
-    Hid-Write-Status -Event Information -Message "Connecting to Office 365.."
+    Write-Information -Message "Connecting to Office 365.."
 
     $module = Import-Module ExchangeOnlineManagement
 
@@ -423,14 +423,26 @@ try{
 
     $exchangeSession = Connect-ExchangeOnline -Credential $credential -ShowBanner:$false -ShowProgress:$false -TrackPerformance:$false -ErrorAction Stop 
 
-    Hid-Write-Status -Event Success -Message "Successfully connected to Office 365"
+    Write-Information -Message "Successfully connected to Office 365"
+
+    $Log = @{
+        Action            = "MoveAccount" # optional. ENUM (undefined = default) 
+        System            = "ExchangeOnline" # optional (free format text) 
+        Message           = "Successfully connected to Office 365" # required (free format text) 
+        IsError           = $false # optional. Elastic reporting purposes only. (default = $false. $true = Executed action returned an error) 
+        TargetDisplayName = ""# optional (free format text) 
+        TargetIdentifier  = "" # optional (free format text) 
+    }
+    #send result back  
+    Write-Information -Tags "Audit" -MessageData $log
+
 }catch{
     throw "Could not connect to Exchange Online, error: $_"
 }
 
 # Get Exchange mailbox permissions
 try {
-    Hid-Write-Status -Event Information -Message "Searching for user: $UserPrincipalName"
+    Write-Information -Message "Searching for user: $UserPrincipalName"
     $adUser = Get-ADUser -Filter "UserPrincipalName -eq '$($UserPrincipalName)'" -Properties MemberOf
     
     # Can't be used because of a bug in PS 5.1
@@ -443,14 +455,14 @@ try {
     $adGroupsWithMailboxPermissions = $adGroups | Where-Object { $_.Name -Like "Mbx_*" }
 
     # Get All mailboxes
-    Hid-Write-Status -Event Information -Message "Gathering all mailboxes.."
+    Write-Information -Message "Gathering all mailboxes.."
     $mailboxes = Get-EXOMailbox -PropertySets Minimum,Delivery -ResultSize Unlimited -ErrorAction Stop
     $mailBoxesGrouped = $mailboxes | Group-Object -Property Identity -AsHashTable
     [System.Collections.ArrayList]$allMailboxesWithPermission = @()
 
 
     # List all users with Full Access permissions
-    Hid-Write-Status -Event Information -Message "Gathering Full Access Permissions.."
+    Write-Information -Message "Gathering Full Access Permissions.."
     [System.Collections.ArrayList]$mailboxesFullAccess = @()    
     $fullAccessPermissions = $mailboxes | Get-EXOMailboxPermission | Where-Object { ($_.AccessRights -like "*fullaccess*") -and -not ($_.Deny -eq $true) -and -not ($_.User -match "NT AUTHORITY") } -ErrorAction Stop
     foreach($fullAccessPermission in $fullAccessPermissions){
@@ -495,7 +507,7 @@ try {
         }
     }
 
-    Hid-Write-Status -Event Information -Message "Mailboxes which user has Full Access permissions to: $($mailboxesFullAccess.Count)"
+    Write-Information -Message "Mailboxes which user has Full Access permissions to: $($mailboxesFullAccess.Count)"
     
     if($mailboxesFullAccess.Count -gt 0){
         foreach($entry in $mailboxesFullAccess){
@@ -506,7 +518,7 @@ try {
 
 
     # List all mailboxes to which a user has Send As permissions
-    Hid-Write-Status -Event Information -Message "Gathering Send As Permissions.."
+    Write-Information -Message "Gathering Send As Permissions.."
     [System.Collections.ArrayList]$mailboxesSendAs = @()
     $SendAsPermissions = Get-EXORecipientPermission -ResultSize Unlimited -AccessRights SendAs
     foreach($SendAsPermission in $SendAsPermissions){
@@ -551,7 +563,7 @@ try {
         }
     }
 
-    Hid-Write-Status -Event Information -Message "Mailboxes which user has Send As permissions to: $($mailboxesSendAs.Count)"
+    Write-Information -Message "Mailboxes which user has Send As permissions to: $($mailboxesSendAs.Count)"
     
     if($mailboxesSendAs.Count -gt 0){
         foreach($entry in $mailboxesSendAs){
@@ -561,7 +573,7 @@ try {
 
 
     # List all mailboxes to which a particular security principal has Send on behalf of permissions
-    Hid-Write-Status -Event Information -Message "Gathering Send On Behalf Permissions.."
+    Write-Information -Message "Gathering Send On Behalf Permissions.."
     [System.Collections.ArrayList]$mailboxesSendOnBehalf = @()
 
     foreach($mailbox in $mailboxes){
@@ -600,7 +612,7 @@ try {
         }
     }
 
-    Hid-Write-Status -Event Information -Message "Mailboxes which user has Send On Behalf permissions to: $($mailboxesSendOnBehalf.Count)"
+    Write-Information -Message "Mailboxes which user has Send On Behalf permissions to: $($mailboxesSendOnBehalf.Count)"
     
     if($mailboxesSendOnBehalf.Count -gt 0){
         foreach($entry in $mailboxesSendOnBehalf){
@@ -664,22 +676,32 @@ try {
     
         Send-MailMessage @filledParams -ErrorAction Stop
     
-        Hid-Write-Status -Event Success -Message "Successfully sent mail to [$mailTo]"   
+        Write-Information -Message "Successfully sent mail to [$mailTo]"   
     }catch{
-        Hid-Write-Status -Event Warning -Message $aduser
-        Hid-Write-Status -Event Error -Message "Error sending mail to [$mailTo]: $_"
+        Write-Warning -Message $aduser
+        Write-Error -Message "Error sending mail to [$mailTo]: $_"
     }
 
 
     # Clean up temp csv file
     Remove-Item -Path $fileName -Force -Confirm:$false
 } catch {
-    HID-Write-Status -Message "Error gathering mailbox permissions for [$UserPrincipalName]. Error: $_" -Event Error
-    HID-Write-Summary -Message "Error gathering mailbox permissions for [$UserPrincipalName]" -Event Failed
+    Write-Error -Message "Error gathering mailbox permissions for [$UserPrincipalName]. Error: $_"
+
+    $Log = @{
+        Action            = "MoveAccount" # optional. ENUM (undefined = default) 
+        System            = "ExchangeOnline" # optional (free format text) 
+        Message           = "Error gathering mailbox permissions for [$UserPrincipalName]" # required (free format text) 
+        IsError           = $true # optional. Elastic reporting purposes only. (default = $false. $true = Executed action returned an error) 
+        TargetDisplayName = ""# optional (free format text) 
+        TargetIdentifier  = "" # optional (free format text) 
+    }
+    #send result back  
+    Write-Information -Tags "Audit" -MessageData $log
 } finally {
-    Hid-Write-Status -Event Information -Message "Disconnecting from Office 365.."
+    Write-Information -Message "Disconnecting from Office 365.."
     $exchangeSessionEnd = Disconnect-ExchangeOnline -Confirm:$false -Verbose:$false -ErrorAction Stop
-    Hid-Write-Status -Event Success -Message "Successfully disconnected from Office 365"
+    Write-Information -Message "Successfully disconnected from Office 365" 
 }
 '@; 
 
